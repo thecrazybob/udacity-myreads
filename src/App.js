@@ -1,4 +1,5 @@
 import React from 'react'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
 import ListBooks from './ListBooks.js'
@@ -7,19 +8,17 @@ class BooksApp extends React.Component {
 
   
   state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
-    showSearchPage: false,
     books: [],
     categories: [
-      {id: 1, shelf: 'currentlyReading', name: 'Currently reading'},
-      {id: 2, shelf: 'wantToRead', name: 'Want to read'},
+      {id: 1, shelf: 'currentlyReading', name: 'Currently Reading'},
+      {id: 2, shelf: 'wantToRead', name: 'Want to Read'},
       {id: 3, shelf: 'read', name: 'Read'},
+      {id: 4, shelf: 'none', name: 'None'},
     ],
+  }
+
+  updateBooks = () => {
+    this.retrieveBooks()
   }
 
   retrieveBooks = () => {
@@ -36,11 +35,13 @@ class BooksApp extends React.Component {
 
   render() {
     return (
+      <Router>
       <div className="app">
-        {this.state.showSearchPage ? (
+
+        <Route path="/search">
           <div className="search-books">
             <div className="search-books-bar">
-              <button className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</button>
+              <Link to="/"><button className="close-search">Close</button></Link>
               <div className="search-books-input-wrapper">
                 {/*
                   NOTES: The search from BooksAPI is limited to a particular set of search terms.
@@ -58,25 +59,30 @@ class BooksApp extends React.Component {
               <ol className="books-grid"></ol>
             </div>
           </div>
-        ) : (
+        </Route>
+
+        <Route exact path="/">
           <div className="list-books">
             <div className="list-books-title">
               <h1>MyReads</h1>
             </div>
             <div className="list-books-content">
               <div>
-                { this.state.categories.map( category => {
-                  return(<ListBooks category={category} books={this.state.books} />)
+                { this.state.categories.filter( currentCategory => currentCategory.shelf !== "none").map( currentCategory => {
+                  return(<ListBooks updateBooks={this.updateBooks} key={currentCategory.id} currentCategory={currentCategory} categories={this.state.categories} books={this.state.books} />)
                 }) }
                 
               </div>
             </div>
             <div className="open-search">
-              <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
+              <Link to="/search">
+              <button>Add a book</button>
+              </Link>
             </div>
           </div>
-        )}
+        </Route>
       </div>
+      </Router>
     )
   }
 }

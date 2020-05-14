@@ -1,14 +1,14 @@
 import React from 'react'
 
-const SingleBookShelfChanger = () => {
+const SingleBookShelfChanger = (props) => {
     return(
         <div className="book-shelf-changer">
-          <select>
+          <select onChange={(event) => { props.onUpdate(props.book, event.target.value) } }>
             <option value="move" disabled>Move to...</option>
-            <option value="currentlyReading">Currently Reading</option>
-            <option value="wantToRead">Want to Read</option>
-            <option value="read">Read</option>
-            <option value="none">None</option>
+            { props.categories.map( category => {
+              return(<option key={category.id} value={category.shelf}>{category.name}</option>)
+            })}
+            
           </select>
         </div>
     )
