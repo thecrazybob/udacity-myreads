@@ -91,8 +91,6 @@ class BooksApp extends React.Component {
               <div className="search-books-input-wrapper">
 
                 <input value={this.state.searchQuery} onChange={this.handleSearchQuery} type="text" placeholder="Search by title or author"/>
-          { this.state.searchQuery }
-          {/* { JSON.stringify(this.state.searchResults) } */}
 
               </div>
             </div>
