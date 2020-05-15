@@ -24,17 +24,25 @@ class BooksApp extends React.Component {
   };
 
   retrieveBooks = () => {
+
     BooksAPI.getAll().then((retrievedBooks) => {
       this.setState({
         books: retrievedBooks,
-      });
+      })
     });
+    
   };
 
   handleSearchQuery = (event) => {
     this.setState({
       searchQuery: event.target.value,
     });
+
+    if (event.target.value.length === 0) {
+      this.setState({
+        searchResults: []
+      })
+    }
     this.searchForBooks(event.target.value);
   };
 
@@ -54,10 +62,6 @@ class BooksApp extends React.Component {
             searchResults: response,
           });
         }
-      } else {
-        this.setState({
-          searchResults: [],
-        });
       }
     });
   };
@@ -86,12 +90,14 @@ class BooksApp extends React.Component {
                 </div>
               </div>
               <div className="search-books-results">
-                {this.state.searchQuery !== "" ? (
+                {this.state.searchQuery ? (
                   <ListBooks
                     currentCategory=""
                     books={this.state.searchResults}
                     updateBooks={this.updateBooks}
                     categories={this.state.categories}
+                    booksOnHomePage={this.state.books}
+                    isSearch={true}
                   />
                 ) : (
                   "Type something to search for!"

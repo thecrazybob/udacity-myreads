@@ -5,7 +5,8 @@ class ListBooks extends Component {
   render() {
     return (
       <ol className="books-grid">
-        {this.props.books !== [] ? (
+        {this.props.books.length > 0 ? (
+          
           this.props.books
             .filter((book) => book.shelf === this.props.currentCategory.shelf)
             .map((book) => {
@@ -15,11 +16,13 @@ class ListBooks extends Component {
                   key={book.id}
                   book={book}
                   categories={this.props.categories}
+                  booksOnHomePage={this.props.booksOnHomePage}
+                  isSearch={this.props.isSearch ? this.props.isSearch : false}
                 />
               );
             })
         ) : (
-          <p>No results found for the search query</p>
+          this.props.isSearch ? <p>No results found for the search query</p> : '' 
         )}
       </ol>
     );
