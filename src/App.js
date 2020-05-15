@@ -2,7 +2,9 @@ import React from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
+import Shelf from './Shelf.js'
 import ListBooks from './ListBooks.js'
+import { debounce } from 'throttle-debounce'
 
 class BooksApp extends React.Component {
 
@@ -15,6 +17,8 @@ class BooksApp extends React.Component {
       {id: 3, shelf: 'read', name: 'Read'},
       {id: 4, shelf: 'none', name: 'None'},
     ],
+    searchQuery: '',
+    searchResults: [],
   }
 
   updateBooks = () => {
@@ -27,6 +31,48 @@ class BooksApp extends React.Component {
         books: retrievedBooks
       })
     })
+  }
+  
+  handleSearchQuery = event => {
+  
+    this.setState({
+      searchQuery: event.target.value
+    })
+    this.searchForBooks(event.target.value)
+  
+  }
+
+  searchForBooks = debounce(300, false, query => {
+    this.getSearchResults(query)
+  })
+
+  getSearchResults = (query) => {
+    BooksAPI.search(query).then(
+      response => {
+
+        if (query.length > 0) {
+
+          if (response.error) {
+            this.setState({
+              searchResults: []
+            })
+          }
+
+          else {
+            this.setState({
+              searchResults: response
+            })
+          }
+        }
+        
+        else {
+          this.setState({
+            searchResults: []
+          })
+        }
+
+      }
+    )
   }
 
   componentDidMount() {
@@ -43,20 +89,17 @@ class BooksApp extends React.Component {
             <div className="search-books-bar">
               <Link to="/"><button className="close-search">Close</button></Link>
               <div className="search-books-input-wrapper">
-                {/*
-                  NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                  You can find these search terms here:
-                  https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
 
-                  However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                  you don't find a specific author or title. Every search is limited by search terms.
-                */}
-                <input type="text" placeholder="Search by title or author"/>
+                <input value={this.state.searchQuery} onChange={this.handleSearchQuery} type="text" placeholder="Search by title or author"/>
+          { this.state.searchQuery }
+          {/* { JSON.stringify(this.state.searchResults) } */}
 
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              { this.state.searchQuery !== '' ? (
+              <ListBooks currentCategory="" books={this.state.searchResults} updateBooks={this.updateBooks} categories={this.state.categories} />
+              ) : 'Type something to search for!'}
             </div>
           </div>
         </Route>
@@ -69,7 +112,7 @@ class BooksApp extends React.Component {
             <div className="list-books-content">
               <div>
                 { this.state.categories.filter( currentCategory => currentCategory.shelf !== "none").map( currentCategory => {
-                  return(<ListBooks updateBooks={this.updateBooks} key={currentCategory.id} currentCategory={currentCategory} categories={this.state.categories} books={this.state.books} />)
+                  return(<Shelf updateBooks={this.updateBooks} key={currentCategory.id} currentCategory={currentCategory} categories={this.state.categories} books={this.state.books} />)
                 }) }
                 
               </div>
