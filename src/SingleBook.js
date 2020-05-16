@@ -14,18 +14,22 @@ class SingleBook extends Component {
     BooksAPI.update(book, shelf).then((book) => {
       this.props.onUpdateBooks(book, shelf);
     });
-    this.determineShelf()
+    if (shelf !== 'none') {
+      setTimeout(() => {
+        this.determineShelf()
+      }, 1500)
+    } else {
+      this.setState({
+        shelf: 'none'
+      })
+    } 
   };
 
   determineShelf = () => {
     if (this.props.isSearch === true) {
       this.props.booksOnHomePage
         .filter(book => book.id === this.props.book.id)
-        .map(book => {
-          return this.setState({
-            shelf: book.shelf
-          })
-        })
+        .map((book) => this.setState({shelf: book.shelf}))
     }
   }
 
@@ -44,6 +48,7 @@ class SingleBook extends Component {
               categories={this.props.categories}
               onUpdate={this.changeBookShelf}
               shelf={this.state.shelf}
+              isSearch={this.props.isSearch}
             />
           </div>
           <SingleBookInfo
